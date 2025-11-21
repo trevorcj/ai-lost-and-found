@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "username": "lina_m",
+    "location": "Nairobi, Kenya",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "Morning light slipping through narrow streets",
+    "date": "2025-01-14"
+  },
+  {
+    "id": 2,
+    "username": "kaito_s",
+    "location": "Osaka, Japan",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "A quiet walk past shuttered shops",
+    "date": "2025-02-01"
+  },
+  {
+    "id": 3,
+    "username": "robin_t",
+    "location": "Reykjavik, Iceland",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "Salt wind drifting from the harbor",
+    "date": "2025-03-09"
+  },
+  {
+    "id": 4,
+    "username": "amara_k",
+    "location": "Lagos, Nigeria",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "Streets humming with late evening chatter",
+    "date": "2025-03-22"
+  },
+  {
+    "id": 5,
+    "username": "leo_f",
+    "location": "San Francisco, USA",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "Fog rolling in over tiled rooftops",
+    "date": "2025-04-12"
+  },
+  {
+    "id": 6,
+    "username": "safa_h",
+    "location": "Dubai, UAE",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "Warm dust rising from an empty road",
+    "date": "2025-05-03"
+  },
+  {
+    "id": 7,
+    "username": "marco_v",
+    "location": "Rome, Italy",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "A narrow courtyard filled with soft echoes",
+    "date": "2025-05-10"
+  },
+  {
+    "id": 8,
+    "username": "hana_r",
+    "location": "Seoul, South Korea",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "Cafe windows bright with early chatter",
+    "date": "2025-06-01"
+  },
+  {
+    "id": 9,
+    "username": "thabo_p",
+    "location": "Johannesburg, South Africa",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "Dust hanging above a crowded market",
+    "date": "2025-06-18"
+  },
+  {
+    "id": 10,
+    "username": "elena_b",
+    "location": "Madrid, Spain",
+    "imgUrl": "https://placehold.co/1080x1080",
+    "description": "Stone corridors shining after the rain",
+    "date": "2025-07-04"
+  }
+]

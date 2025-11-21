@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+:root {
+  --brand-input: #f3f3f3;
+  --brand-white: #ffffff;
+  --brand-blue: #0095fa;
+
+  --text-main: #292929;
+  --bg-main: #f6f6f6;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}
