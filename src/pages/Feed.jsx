@@ -1,4 +1,3 @@
-// src/pages/Feed.jsx
 import AddItemModal from "../components/AddItemModal";
 import FinderModal from "../components/FinderModal";
 import {

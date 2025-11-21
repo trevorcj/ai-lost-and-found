@@ -56,7 +56,6 @@ function AddItemModal({ setShowAddItemModal }) {
     }
 
     const json = await res.json();
-    // secure_url is safe to use as imgUrl
     return json.secure_url;
   }
 
@@ -143,13 +142,9 @@ function AddItemModal({ setShowAddItemModal }) {
           />
         </label>
 
-        {/* show selected filename (keeps your styling intact) */}
         <div className="text-sm text-stone-500">
           {fileName || "No file selected"}
         </div>
-
-        {/* disabled username + date fields removed from modal UI per your request */}
-        {/* username and date will be injected into the new item in state only */}
 
         <label htmlFor="location">
           <input
@@ -171,7 +166,6 @@ function AddItemModal({ setShowAddItemModal }) {
           />
         </label>
 
-        {/* date remains hidden from modal UI and added by code */}
         <div className="flex gap-5 justify-end items-center mt-2">
           <p
             onClick={handleCloseModal}

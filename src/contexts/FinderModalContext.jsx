@@ -13,6 +13,7 @@ export function FinderModalProvider({ children }) {
 
   function closeFinder() {
     setShowFinderModal(false);
+    // allow a short delay then clear selectedItem
     setTimeout(() => setSelectedItem(null), 200);
   }
 

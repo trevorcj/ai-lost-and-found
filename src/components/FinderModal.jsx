@@ -1,14 +1,14 @@
-// src/components/FinderModal.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { useFinderModal } from "../contexts/FinderModalContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useModalContext } from "../contexts/AddItemModalContext";
 
 export default function FinderModal() {
   const { showFinderModal, selectedItem, closeFinder } = useFinderModal();
   const { currentUser } = useAuth();
+  const { removeItem } = useModalContext();
   const overlayRef = useRef();
 
-  // local state
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [similarity, setSimilarity] = useState(null);
@@ -24,7 +24,6 @@ export default function FinderModal() {
   const [finderLocation, setFinderLocation] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  // simple toast
   const [toast, setToast] = useState(null);
   useEffect(() => {
     if (!toast) return;
@@ -35,13 +34,12 @@ export default function FinderModal() {
   useEffect(() => {
     let mounted = true;
     if (!showFinderModal) return;
-    if (modelLoaded) return; // already loaded
+    if (modelLoaded) return;
     setLoadingModel(true);
     (async () => {
       try {
         const tf = await import("@tensorflow/tfjs");
         const mobilenet = await import("@tensorflow-models/mobilenet");
-
         const m = await mobilenet.load({ version: 2, alpha: 1.0 });
         if (!mounted) return;
         setModel({ tf, mobilenetModel: m });
@@ -82,8 +80,8 @@ export default function FinderModal() {
       img.src = url;
     });
 
+  // safe similarity
   const cosineSimilarity = (tf, a, b) => {
-    // a and b are tensors
     const dot = a.dot(b).arraySync();
     const na = a.norm().arraySync();
     const nb = b.norm().arraySync();
@@ -120,7 +118,6 @@ export default function FinderModal() {
         return activation.flatten();
       });
 
-      // compute cosine
       const cos = cosineSimilarity(tf, embA, embB);
       const percent = Math.round(((cos + 1) / 2) * 10000) / 100;
       setSimilarity(percent);
@@ -133,7 +130,6 @@ export default function FinderModal() {
         setToast({ type: "success", text: `Match ${percent}% — proceed` });
       } else {
         setToast({ type: "error", text: `Not a match (${percent}%).` });
-        // auto-close modal after delay
         setTimeout(() => {
           closeFinder();
         }, 900);
@@ -152,17 +148,24 @@ export default function FinderModal() {
     }
   }
 
-  // Submit finder details (simulate)
   const handleSubmitFinder = (e) => {
     e.preventDefault();
     if (!finderMobile.trim() || !finderLocation.trim()) {
       setToast({ type: "error", text: "Fill required fields" });
       return;
     }
+
     setSubmitted(true);
     setToast({ type: "success", text: "Finder info submitted" });
 
-    // record the match, store finder details, notify poster via email, etc.
+    // remove the matched item from the feed
+    try {
+      if (selectedItem && selectedItem.id) {
+        removeItem(selectedItem.id);
+      }
+    } catch (err) {
+      console.warn("removeItem failed", err);
+    }
   };
 
   if (!showFinderModal || !selectedItem) return null;
@@ -305,7 +308,6 @@ export default function FinderModal() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3">
-                  {/* small success GIF or icon: you can swap GIF url */}
                   <img
                     src="https://media.giphy.com/media/111ebonMs90YLu/giphy.gif"
                     alt="success"

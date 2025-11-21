@@ -48,15 +48,13 @@ export function AddItemModalProvider({ children }) {
     setItems((prev) => [newItem, ...prev]);
   }
 
+  function removeItem(id) {
+    setItems((prev) => prev.filter((it) => it.id !== id));
+  }
+
   return (
     <ModalContext.Provider
-      value={{
-        showAddItemModal,
-        setShowAddItemModal,
-        handleAddItem,
-        items,
-        addItem,
-      }}>
+      value={{ items, addItem, removeItem, showAddItemModal, handleAddItem }}>
       {children}
     </ModalContext.Provider>
   );
