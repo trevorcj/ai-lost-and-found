@@ -34,8 +34,8 @@ function AddItemModal({ setShowAddItemModal }) {
 
   // Upload to Cloudinary
   async function uploadFileToCloudinary(fileToUpload) {
-    const CLOUD_NAME = "dhd6wvd09";
-    const UPLOAD_PRESET = "lostnfound";
+    const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
     const fd = new FormData();
     fd.append("file", fileToUpload);
