@@ -174,33 +174,33 @@ export default function FinderModal() {
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="bg-stone-950/10 backdrop-blur fixed w-full h-screen top-0 left-0 flex justify-center items-start pt-6 z-50">
+      className="fixed top-0 left-0 z-50 flex items-start justify-center w-full h-screen pt-6 bg-stone-950/10 backdrop-blur">
       <div
         onClick={(e) => e.stopPropagation()}
         className="flex flex-col gap-3 w-md mx-auto bg-white rounded-3xl p-6 shadow-natural text-(--text-main) min-h-[70vh] max-h-[90vh] overflow-auto">
-        <h1 className="tracking-tighter text-xl font-bold">Compare images</h1>
+        <h1 className="text-xl font-bold tracking-tighter">Compare images</h1>
 
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col gap-4 md:flex-row">
           <div className="flex-1">
-            <p className="text-sm text-stone-400 mb-2">Original item</p>
+            <p className="mb-2 text-sm text-stone-400">Original item</p>
             <img
               src={selectedItem.imgUrl}
               alt={selectedItem.description}
-              className="w-full rounded-2xl object-cover max-h-72"
+              className="object-cover w-full rounded-2xl max-h-72"
             />
-            <p className="text-xs mt-2 text-stone-500">
+            <p className="mt-2 text-xs text-stone-500">
               {selectedItem.description}
             </p>
           </div>
 
           <div className="flex-1">
-            <p className="text-sm text-stone-400 mb-2">Upload photo (finder)</p>
+            <p className="mb-2 text-sm text-stone-400">Upload photo (finder)</p>
 
             <label
               htmlFor="finder-file"
-              className="flex flex-col items-center justify-center w-full h-40 border border-stone-100 rounded-2xl cursor-pointer bg-white hover:bg-stone-50/85 transition duration-300 ease-in-out">
+              className="flex flex-col items-center justify-center w-full h-40 transition duration-300 ease-in-out bg-white border cursor-pointer border-stone-100 rounded-2xl hover:bg-stone-50/85">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <p className="font-semibold mb-2">Click to upload</p>
+                <p className="mb-2 font-semibold">Click to upload</p>
                 <p className="text-xs">PNG, JPG or GIF</p>
               </div>
               <input
@@ -223,7 +223,7 @@ export default function FinderModal() {
               {fileName || "No file selected"}
             </div>
 
-            <div className="flex gap-3 items-center mt-3">
+            <div className="flex items-center gap-3 mt-3">
               <button
                 type="button"
                 onClick={handleCompare}
@@ -261,7 +261,7 @@ export default function FinderModal() {
           {showFinderForm && (
             <form
               onSubmit={handleSubmitFinder}
-              className="mt-4 flex flex-col gap-3">
+              className="flex flex-col gap-3 mt-4">
               <input
                 type="text"
                 placeholder="Your name (optional)"
@@ -281,20 +281,20 @@ export default function FinderModal() {
 
               <input
                 type="text"
-                placeholder="Public pickup location (e.g. 'Ikeja Mall car park')"
+                placeholder="Public pickup location (e.g. 'Car park')"
                 value={finderLocation}
                 onChange={(e) => setFinderLocation(e.target.value)}
                 className="px-6 py-3 rounded-md w-full focus:outline-none focus:ring focus:ring-(--text-main)"
                 required
               />
 
-              <div className="text-sm text-yellow-800 bg-yellow-100 p-3 rounded-md">
+              <div className="p-3 text-sm text-yellow-800 bg-yellow-100 rounded-md">
                 ⚠️ Caution: enter a public, safe location only. Avoid private
                 addresses for your safety.
               </div>
 
               {!submitted ? (
-                <div className="flex gap-3 justify-end items-center">
+                <div className="flex items-center justify-end gap-3">
                   <p
                     onClick={() => setShowFinderForm(false)}
                     className="cursor-pointer">
@@ -302,7 +302,7 @@ export default function FinderModal() {
                   </p>
                   <button
                     type="submit"
-                    className="py-2 px-4 rounded-md text-white bg-emerald-600 hover:bg-emerald-700">
+                    className="px-4 py-2 text-white rounded-md bg-emerald-600 hover:bg-emerald-700">
                     Submit
                   </button>
                 </div>
