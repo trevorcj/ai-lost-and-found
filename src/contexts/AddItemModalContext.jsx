@@ -38,7 +38,7 @@ export function AddItemModalProvider({ children }) {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [items]);
 
   function handleAddItem() {
     setShowAddItemModal((prev) => !prev);

@@ -1,82 +1,35 @@
 [
   {
     "id": 1,
-    "username": "lina_m",
-    "location": "Nairobi, Kenya",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "Morning light slipping through narrow streets",
-    "date": "2025-01-14"
-  },
-  {
-    "id": 2,
-    "username": "kaito_s",
-    "location": "Osaka, Japan",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "A quiet walk past shuttered shops",
-    "date": "2025-02-01"
+    "username": "sofia_r",
+    "location": "Berlin, Germany — Alexanderplatz",
+    "imgUrl": "https://bullstrap.co/cdn/shop/files/8_a057052e-1024-41e2-9263-ecebadf509a5.png",
+    "description": "Black leather wallet with metro card and student ID inside",
+    "date": "2025-01-12"
   },
   {
     "id": 3,
-    "username": "robin_t",
-    "location": "Reykjavik, Iceland",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "Salt wind drifting from the harbor",
-    "date": "2025-03-09"
+    "username": "maya_g",
+    "location": "Toronto, Canada — Union Station",
+    "imgUrl": "https://ae01.alicdn.com/kf/S62553330325342ddbe66b1f835a1a8e72.jpg",
+    "description": "iPhone 12 with a transparent case and a maple leaf sticker",
+    "date": "2025-02-02"
   },
-  {
-    "id": 4,
-    "username": "amara_k",
-    "location": "Lagos, Nigeria",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "Streets humming with late evening chatter",
-    "date": "2025-03-22"
-  },
+
   {
     "id": 5,
-    "username": "leo_f",
-    "location": "San Francisco, USA",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "Fog rolling in over tiled rooftops",
-    "date": "2025-04-12"
+    "username": "luca_p",
+    "location": "Rome, Italy — Termini Station",
+    "imgUrl": "https://u-mercari-images.mercdn.net/photos/m94392478022_2.jpg",
+    "description": "Black Sony wireless headphones in a zip case",
+    "date": "2025-02-28"
   },
   {
     "id": 6,
-    "username": "safa_h",
-    "location": "Dubai, UAE",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "Warm dust rising from an empty road",
-    "date": "2025-05-03"
-  },
-  {
-    "id": 7,
-    "username": "marco_v",
-    "location": "Rome, Italy",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "A narrow courtyard filled with soft echoes",
-    "date": "2025-05-10"
-  },
-  {
-    "id": 8,
-    "username": "hana_r",
-    "location": "Seoul, South Korea",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "Cafe windows bright with early chatter",
-    "date": "2025-06-01"
-  },
-  {
-    "id": 9,
-    "username": "thabo_p",
-    "location": "Johannesburg, South Africa",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "Dust hanging above a crowded market",
-    "date": "2025-06-18"
-  },
-  {
-    "id": 10,
-    "username": "elena_b",
-    "location": "Madrid, Spain",
-    "imgUrl": "https://placehold.co/1080x1080",
-    "description": "Stone corridors shining after the rain",
-    "date": "2025-07-04"
+    "username": "amira_h",
+    "location": "Cairo, Egypt — Tahrir Square",
+    "imgUrl": "https://i.etsystatic.com/61605310/r/il/cb1c2d/7185938007/il_1588xN.7185938007_5p5o.jpg",
+    "description": "Silver water bottle with Arabic calligraphy sticker",
+    "date": "2025-03-05"
   }
 ]

@@ -37,7 +37,6 @@ function ModalWrapper() {
   return (
     <>
       {showAddItemModal && <AddItemModal setShowAddItemModal={handleAddItem} />}
-      {/* FinderModal handles its own visibility via FinderModalContext */}
       <FinderModal />
     </>
   );
@@ -70,7 +69,7 @@ function Items({ items }) {
               </div>
             </div>
             <img
-              className="mb-3 rounded-2xl"
+              className="object-cover max-h-[350px] w-full mb-3 rounded-2xl"
               src={item.imgUrl}
               alt={item.description}
             />
