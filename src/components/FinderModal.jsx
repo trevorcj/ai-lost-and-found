@@ -1,346 +1,301 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useFinderModal } from "../contexts/FinderModalContext";
-import { useAuth } from "../contexts/AuthContext";
-import { useModalContext } from "../contexts/AddItemModalContext";
 
-export default function FinderModal() {
-  const { showFinderModal, selectedItem, closeFinder } = useFinderModal();
-  const { currentUser } = useAuth();
-  const { removeItem } = useModalContext();
-  const overlayRef = useRef();
+function FinderModal() {
+  const { selectedItem, closeFinder } = useFinderModal();
+  const overlay = useRef();
 
-  const [file, setFile] = useState(null);
-  const [fileName, setFileName] = useState("");
-  const [similarity, setSimilarity] = useState(null);
-  const [loadingModel, setLoadingModel] = useState(false);
-  const [runningCompare, setRunningCompare] = useState(false);
-  const [modelLoaded, setModelLoaded] = useState(false);
-  const [model, setModel] = useState(null);
+  // --- STATE ---
+  const [foundFile, setFoundFile] = useState(null);
+  const [foundPreview, setFoundPreview] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [result, setResult] = useState(null);
 
-  const [nextEnabled, setNextEnabled] = useState(false);
+  // Form State
   const [showFinderForm, setShowFinderForm] = useState(false);
   const [finderName, setFinderName] = useState("");
   const [finderMobile, setFinderMobile] = useState("");
   const [finderLocation, setFinderLocation] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const [toast, setToast] = useState(null);
+  // Reset state whenever a NEW item is selected
   useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 3500);
-    return () => clearTimeout(t);
-  }, [toast]);
+    if (selectedItem) resetAllState();
+  }, [selectedItem]);
 
-  useEffect(() => {
-    let mounted = true;
-    if (!showFinderModal) return;
-    if (modelLoaded) return;
-    setLoadingModel(true);
-    (async () => {
-      try {
-        const tf = await import("@tensorflow/tfjs");
-        const mobilenet = await import("@tensorflow-models/mobilenet");
-        const m = await mobilenet.load({ version: 2, alpha: 1.0 });
-        if (!mounted) return;
-        setModel({ tf, mobilenetModel: m });
-        setModelLoaded(true);
-      } catch (e) {
-        console.error("Failed to load TF model", e);
-        setToast({ type: "error", text: "Failed to load model" });
-      } finally {
-        if (mounted) setLoadingModel(false);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [showFinderModal, modelLoaded]);
-
-  const loadImageElementFromUrl = (url) =>
-    new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => resolve(img);
-      img.onerror = (e) => reject(e);
-      img.src = url;
-    });
-
-  const loadImageElementFromFile = (fileBlob) =>
-    new Promise((resolve, reject) => {
-      const url = URL.createObjectURL(fileBlob);
-      const img = new Image();
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        resolve(img);
-      };
-      img.onerror = (e) => {
-        URL.revokeObjectURL(url);
-        reject(e);
-      };
-      img.src = url;
-    });
-
-  // safe similarity
-  const cosineSimilarity = (tf, a, b) => {
-    const dot = a.dot(b).arraySync();
-    const na = a.norm().arraySync();
-    const nb = b.norm().arraySync();
-    const c = dot / (na * nb);
-    return Math.max(-1, Math.min(1, c));
-  };
-
-  // compare function
-  const handleCompare = async () => {
-    setSimilarity(null);
-    setNextEnabled(false);
+  function resetAllState() {
+    setFoundFile(null);
+    setFoundPreview(null);
+    setResult(null);
+    setAnalyzing(false);
     setShowFinderForm(false);
-    if (!selectedItem || !file) {
-      setToast({ type: "error", text: "Select an image and try again" });
-      return;
-    }
-    if (!model || !model.tf || !model.mobilenetModel) {
-      setToast({ type: "error", text: "Model not ready" });
-      return;
-    }
+    setFinderName("");
+    setFinderMobile("");
+    setFinderLocation("");
+    setSubmitted(false);
+  }
 
-    setRunningCompare(true);
-    try {
-      const imgA = await loadImageElementFromUrl(selectedItem.imgUrl);
-      const imgB = await loadImageElementFromFile(file);
+  function handleClose() {
+    resetAllState();
+    closeFinder();
+  }
 
-      const tf = model.tf;
-      const embA = tf.tidy(() => {
-        const activation = model.mobilenetModel.infer(imgA, true);
-        return activation.flatten();
-      });
-      const embB = tf.tidy(() => {
-        const activation = model.mobilenetModel.infer(imgB, true);
-        return activation.flatten();
-      });
+  if (!selectedItem) return null;
 
-      const cos = cosineSimilarity(tf, embA, embB);
-      const percent = Math.round(((cos + 1) / 2) * 10000) / 100;
-      setSimilarity(percent);
-
-      embA.dispose?.();
-      embB.dispose?.();
-
-      if (percent >= 60) {
-        setNextEnabled(true);
-        setToast({ type: "success", text: `Match ${percent}% — proceed` });
-      } else {
-        setToast({ type: "error", text: `Not a match (${percent}%).` });
-        setTimeout(() => {
-          closeFinder();
-        }, 900);
-      }
-    } catch (err) {
-      console.error("compare error", err);
-      setToast({ type: "error", text: "Comparison failed" });
-    } finally {
-      setRunningCompare(false);
-    }
-  };
-
-  function handleOverlayClick(e) {
-    if (overlayRef.current && overlayRef.current.contains(e.target)) {
-      closeFinder();
+  function handleFileChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setFoundFile(file);
+      setFoundPreview(URL.createObjectURL(file));
+      setResult(null);
+      setShowFinderForm(false);
     }
   }
 
-  const handleSubmitFinder = (e) => {
-    e.preventDefault();
-    if (!finderMobile.trim() || !finderLocation.trim()) {
-      setToast({ type: "error", text: "Fill required fields" });
+  async function handleValidate() {
+    if (!foundFile) return;
+
+    const targetUrl = selectedItem.imageurl;
+
+    if (!targetUrl) {
+      alert("Error: This item has no image URL.");
       return;
     }
 
-    setSubmitted(true);
-    setToast({ type: "success", text: "Finder info submitted" });
+    setAnalyzing(true);
+    setResult(null);
 
-    // remove the matched item from the feed
     try {
-      if (selectedItem && selectedItem.id) {
-        removeItem(selectedItem.id);
-      }
-    } catch (err) {
-      console.warn("removeItem failed", err);
+      console.log("calling gemini");
+    } catch (error) {
+      alert("Validation failed.");
+      console.error(error);
+    } finally {
+      setAnalyzing(false);
     }
-  };
+  }
 
-  if (!showFinderModal || !selectedItem) return null;
+  function handleSubmitFinder(e) {
+    e.preventDefault();
+    if (!finderMobile.trim() || !finderLocation.trim()) {
+      alert("Please fill in the required fields.");
+      return;
+    }
+    alert("item found");
+  }
 
   return (
     <div
-      ref={overlayRef}
-      onClick={handleOverlayClick}
-      className="fixed top-0 left-0 z-50 flex items-start justify-center w-full h-screen pt-6 bg-stone-950/10 backdrop-blur">
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="flex flex-col gap-3 w-md mx-auto bg-white rounded-3xl p-6 shadow-natural text-(--text-main) min-h-[70vh] max-h-[90vh] overflow-auto">
-        <h1 className="text-xl font-bold tracking-tighter">Compare images</h1>
-
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className="flex-1">
-            <p className="mb-2 text-sm text-stone-400">Original item</p>
+      ref={overlay}
+      onClick={(e) => {
+        if (overlay.current === e.target) handleClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/20 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[85vh] md:h-[600px]">
+        <div className="flex flex-col w-full p-6 border-b md:w-1/2 bg-stone-50 md:border-b-0 md:border-r border-stone-100">
+          <h3 className="mb-4 text-sm font-bold tracking-wider uppercase text-stone-400">
+            Looking For
+          </h3>
+          <div className="relative flex-1 mb-4 overflow-hidden bg-white border shadow-sm rounded-2xl border-stone-100 group">
             <img
-              src={selectedItem.imgUrl}
-              alt={selectedItem.description}
-              className="object-cover w-full rounded-2xl max-h-72"
+              src={selectedItem.imageurl}
+              className="object-cover w-full h-full"
+              alt="Lost item"
             />
-            <p className="mt-2 text-xs text-stone-500">
-              {selectedItem.description}
-            </p>
-          </div>
-
-          <div className="flex-1">
-            <p className="mb-2 text-sm text-stone-400">Upload photo (finder)</p>
-
-            <label
-              htmlFor="finder-file"
-              className="flex flex-col items-center justify-center w-full h-40 transition duration-300 ease-in-out bg-white border cursor-pointer border-stone-100 rounded-2xl hover:bg-stone-50/85">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <p className="mb-2 font-semibold">Click to upload</p>
-                <p className="text-xs">PNG, JPG or GIF</p>
-              </div>
-              <input
-                id="finder-file"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files && e.target.files[0];
-                  setFile(f || null);
-                  setFileName(f ? f.name : "");
-                  setSimilarity(null);
-                  setNextEnabled(false);
-                  setShowFinderForm(false);
-                }}
-              />
-            </label>
-
-            <div className="mt-2 text-sm text-stone-500">
-              {fileName || "No file selected"}
-            </div>
-
-            <div className="flex items-center gap-3 mt-3">
-              <button
-                type="button"
-                onClick={handleCompare}
-                disabled={loadingModel || runningCompare || !file}
-                className="py-2 px-4 rounded-md text-white bg-(--text-main) hover:bg-(--text-main)/90 disabled:bg-(--text-main)/20 disabled:cursor-not-allowed">
-                {runningCompare
-                  ? "Comparing..."
-                  : loadingModel
-                  ? "Loading model..."
-                  : "Validate"}
-              </button>
-
-              <div className="text-sm text-stone-500">
-                {similarity !== null && (
-                  <div>
-                    Match: <strong>{similarity}%</strong>
-                  </div>
-                )}
-              </div>
+            <div className="absolute bottom-0 left-0 w-full p-4 text-white bg-gradient-to-t from-black/60 to-transparent">
+              <p className="text-lg font-bold">{selectedItem.description}</p>
+              <p className="text-sm opacity-80">{selectedItem.location}</p>
             </div>
           </div>
         </div>
 
-        <div>
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={() => setShowFinderForm(true)}
-              disabled={!nextEnabled}
-              className="py-2 px-4 rounded-md text-white bg-(--text-main) hover:bg-(--text-main)/90 disabled:bg-(--text-main)/20 disabled:cursor-not-allowed">
-              Next step
-            </button>
-          </div>
-
-          {showFinderForm && (
-            <form
-              onSubmit={handleSubmitFinder}
-              className="flex flex-col gap-3 mt-4">
-              <input
-                type="text"
-                placeholder="Your name (optional)"
-                value={finderName}
-                onChange={(e) => setFinderName(e.target.value)}
-                className="px-6 py-3 rounded-md w-full focus:outline-none focus:ring focus:ring-(--text-main)"
+        <div className="flex flex-col w-full p-6 overflow-y-auto bg-white md:w-1/2">
+          {submitted ? (
+            <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
+              <img
+                src="https://media.giphy.com/media/111ebonMs90YLu/giphy.gif"
+                alt="Success"
+                className="w-32 h-32 rounded-full"
               />
+              <h2 className="text-2xl font-bold text-green-600">
+                Info Submitted!
+              </h2>
+              <p className="max-w-xs text-stone-500">
+                The owner has been notified.
+              </p>
+              <button
+                onClick={handleClose}
+                className="px-6 py-2 mt-4 text-white transition rounded-xl bg-stone-900 hover:bg-stone-800">
+                Close & Back to Feed
+              </button>
+            </div>
+          ) : showFinderForm ? (
+            <div className="flex flex-col h-full">
+              <h3 className="mb-6 text-sm font-bold tracking-wider uppercase text-stone-400">
+                Contact Owner
+              </h3>
+              <form
+                onSubmit={handleSubmitFinder}
+                className="flex flex-col flex-1 gap-4">
+                {/* Inputs */}
+                <div>
+                  <label className="block mb-1 text-xs font-semibold text-stone-400">
+                    YOUR NAME
+                  </label>
+                  <input
+                    type="text"
+                    value={finderName}
+                    onChange={(e) => setFinderName(e.target.value)}
+                    className="w-full px-4 py-3 transition border-none rounded-xl bg-stone-50 focus:ring-2 focus:ring-stone-200 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-xs font-semibold text-stone-400">
+                    MOBILE NUMBER *
+                  </label>
+                  <input
+                    type="tel"
+                    value={finderMobile}
+                    onChange={(e) => setFinderMobile(e.target.value)}
+                    required
+                    className="w-full px-4 py-3 transition border-none rounded-xl bg-stone-50 focus:ring-2 focus:ring-stone-200 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-xs font-semibold text-stone-400">
+                    PICKUP LOCATION *
+                  </label>
+                  <input
+                    type="text"
+                    value={finderLocation}
+                    onChange={(e) => setFinderLocation(e.target.value)}
+                    required
+                    className="w-full px-4 py-3 transition border-none rounded-xl bg-stone-50 focus:ring-2 focus:ring-stone-200 focus:outline-none"
+                  />
+                </div>
 
-              <input
-                type="tel"
-                placeholder="Mobile number"
-                value={finderMobile}
-                onChange={(e) => setFinderMobile(e.target.value)}
-                className="px-6 py-3 rounded-md w-full focus:outline-none focus:ring focus:ring-(--text-main)"
-                required
-              />
-
-              <input
-                type="text"
-                placeholder="Public pickup location (e.g. 'Car park')"
-                value={finderLocation}
-                onChange={(e) => setFinderLocation(e.target.value)}
-                className="px-6 py-3 rounded-md w-full focus:outline-none focus:ring focus:ring-(--text-main)"
-                required
-              />
-
-              <div className="p-3 text-sm text-yellow-800 bg-yellow-100 rounded-md">
-                ⚠️ Caution: enter a public, safe location only. Avoid private
-                addresses for your safety.
-              </div>
-
-              {!submitted ? (
-                <div className="flex items-center justify-end gap-3">
-                  <p
+                <div className="flex gap-3 pt-4 mt-auto">
+                  <button
+                    type="button"
                     onClick={() => setShowFinderForm(false)}
-                    className="cursor-pointer">
+                    className="flex-1 py-3 font-medium transition text-stone-500 hover:bg-stone-100 rounded-xl">
                     Back
-                  </p>
+                  </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 text-white rounded-md bg-emerald-600 hover:bg-emerald-700">
-                    Submit
+                    className="flex-[2] py-3 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition shadow-lg shadow-emerald-100">
+                    Submit Info
                   </button>
                 </div>
-              ) : (
-                <div className="flex flex-col items-center gap-3">
-                  <img
-                    src="https://media.giphy.com/media/111ebonMs90YLu/giphy.gif"
-                    alt="success"
-                    className="w-24 h-24"
-                  />
+              </form>
+            </div>
+          ) : (
+            <>
+              <h3 className="mb-4 text-sm font-bold tracking-wider uppercase text-stone-400">
+                What you found
+              </h3>
+
+              <div className="flex-1 flex flex-col items-center justify-center relative min-h-[300px]">
+                {foundPreview ? (
+                  <div className="relative w-full h-full overflow-hidden rounded-2xl group">
+                    <img
+                      src={foundPreview}
+                      className={`w-full h-full object-cover transition-all duration-500 
+                                    ${
+                                      result && result.similarity >= 60
+                                        ? "ring-4 ring-green-500"
+                                        : ""
+                                    }
+                                    ${
+                                      result && result.similarity < 60
+                                        ? "ring-4 ring-red-500 grayscale"
+                                        : ""
+                                    }
+                                `}
+                      alt="Found preview"
+                    />
+
+                    {/* Result Overlay */}
+                    {result && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-white bg-black/40 backdrop-blur-xs">
+                        <div
+                          className={`text-5xl font-black mb-2 ${
+                            result.similarity >= 60
+                              ? "text-green-400"
+                              : "text-red-400"
+                          }`}>
+                          {result.similarity}%
+                        </div>
+                        <p className="text-lg font-medium">
+                          {result.similarity >= 60
+                            ? "It's a Match!"
+                            : "Not a Match"}
+                        </p>
+                        <p className="text-sm opacity-80 mt-2 max-w-[80%]">
+                          {result.reason}
+                        </p>
+                      </div>
+                    )}
+
+                    {!analyzing && (
+                      <button
+                        onClick={() => {
+                          setFoundFile(null);
+                          setFoundPreview(null);
+                          setResult(null);
+                        }}
+                        className="absolute p-2 text-white transition rounded-full top-3 right-3 bg-white/20 hover:bg-white/40 backdrop-blur">
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-full gap-3 transition border-2 border-dashed cursor-pointer border-stone-200 rounded-2xl hover:bg-stone-50 text-stone-400">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <span className="font-medium">Tap to take photo</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+                  </label>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleClose}
+                  className="flex-1 py-3 font-medium transition text-stone-500 hover:bg-stone-100 rounded-xl">
+                  Cancel
+                </button>
+
+                {!result ? (
                   <button
-                    onClick={() => {
-                      closeFinder();
-                      setSubmitted(false);
-                      setFile(null);
-                      setFileName("");
-                      setSimilarity(null);
-                    }}
-                    className="py-2 px-4 rounded-md text-white bg-(--text-main)">
-                    Back to feed
+                    onClick={handleValidate}
+                    disabled={!foundFile || analyzing}
+                    className="flex-[2] py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    {analyzing ? "Analyzing..." : "Validate Match"}
                   </button>
-                </div>
-              )}
-            </form>
+                ) : (
+                  // Success State Button
+                  result.similarity >= 60 && (
+                    <button
+                      onClick={() => setShowFinderForm(true)}
+                      className="py-3 font-medium text-white transition bg-green-600 shadow-lg flex-2 rounded-xl hover:bg-green-700 shadow-green-200">
+                      Next Step →
+                    </button>
+                  )
+                )}
+              </div>
+            </>
           )}
         </div>
-
-        {toast && (
-          <div
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-md ${
-              toast.type === "error"
-                ? "bg-red-600 text-white"
-                : "bg-green-600 text-white"
-            }`}>
-            {toast.text}
-          </div>
-        )}
       </div>
     </div>
   );
 }
+
+export default FinderModal;

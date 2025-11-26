@@ -1,10 +1,8 @@
 import { useRef, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
 import { useModalContext } from "../contexts/AddItemModalContext";
 
 function AddItemModal({ setShowAddItemModal }) {
   const overlay = useRef();
-  const { currentUser } = useAuth();
   const { addItem } = useModalContext();
 
   // form state
@@ -16,11 +14,6 @@ function AddItemModal({ setShowAddItemModal }) {
   const [uploading, setUploading] = useState(false);
   const [fileName, setFileName] = useState("");
   const [error, setError] = useState("");
-
-  const today = new Date();
-  const formattedDate = `${String(today.getDate()).padStart(2, "0")}/${String(
-    today.getMonth() + 1
-  ).padStart(2, "0")}/${today.getFullYear()}`;
 
   function handleCloseModal() {
     if (typeof setShowAddItemModal === "function") setShowAddItemModal(false);
@@ -72,12 +65,10 @@ function AddItemModal({ setShowAddItemModal }) {
       const imgUrl = await uploadFileToCloudinary(file);
 
       const newItem = {
-        id: Date.now(),
-        username: currentUser || "anonymous",
+        id: crypto.randomUUID(),
         location: location.trim(),
-        imgUrl,
+        imageurl: imgUrl,
         description: description.trim(),
-        date: formattedDate,
       };
 
       addItem(newItem);
