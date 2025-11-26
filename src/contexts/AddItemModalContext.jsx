@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { createRecord, fetchAllRecords } from "../api/manta";
 
 const ModalContext = createContext();
 
@@ -20,32 +21,48 @@ export function AddItemModalProvider({ children }) {
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [items, setItems] = useState([]);
 
+  // useEffect(() => {
+  //   let mounted = true;
+  //   fetch("/data.json")
+  //     .then((r) => r.json())
+  //     .then((json) => {
+  //       if (!mounted) return;
+  //       const normalized = json.map((it) => ({
+  //         ...it,
+  //         date: parseDateToDisplay(it.date),
+  //       }));
+  //       setItems(normalized);
+  //     })
+  //     .catch((e) => {
+  //       console.error("Failed to load data.json", e);
+  //     });
+  //   return () => {
+  //     mounted = false;
+  //   };
+  // }, [items]);
+
   useEffect(() => {
-    let mounted = true;
-    fetch("/data.json")
-      .then((r) => r.json())
-      .then((json) => {
-        if (!mounted) return;
-        const normalized = json.map((it) => ({
-          ...it,
-          date: parseDateToDisplay(it.date),
-        }));
-        setItems(normalized);
-      })
-      .catch((e) => {
-        console.error("Failed to load data.json", e);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [items]);
+    async function loadItems() {
+      const data = await fetchAllRecords();
+      setItems(data);
+    }
+
+    loadItems();
+  });
 
   function handleAddItem() {
     setShowAddItemModal((prev) => !prev);
   }
 
-  function addItem(newItem) {
-    setItems((prev) => [newItem, ...prev]);
+  async function addItem(newItem) {
+    try {
+      // Send items to Manta Studio
+      await createRecord(newItem);
+
+      setItems((prev) => [newItem, ...prev]);
+    } catch (error) {
+      console.log("Failed to save", error);
+    }
   }
 
   function removeItem(id) {
@@ -54,7 +71,8 @@ export function AddItemModalProvider({ children }) {
 
   return (
     <ModalContext.Provider
-      value={{ items, addItem, removeItem, showAddItemModal, handleAddItem }}>
+      value={{ items, addItem, removeItem, showAddItemModal, handleAddItem }}
+    >
       {children}
     </ModalContext.Provider>
   );

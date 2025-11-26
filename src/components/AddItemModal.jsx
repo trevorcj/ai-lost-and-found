@@ -86,16 +86,19 @@ function AddItemModal({ setShowAddItemModal }) {
     <div
       ref={overlay}
       onClick={handleOverlayClick}
-      className="fixed top-0 left-0 flex items-start justify-center w-full h-screen pt-20 bg-stone-950/10 backdrop-blur">
+      className="fixed top-0 left-0 flex items-start justify-center w-full h-screen pt-20 bg-stone-950/10 backdrop-blur"
+    >
       <form
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
-        className="flex flex-col gap-3 w-md bg-white rounded-3xl p-6 shadow-natural text-(--text-main)">
+        className="flex flex-col gap-3 w-md bg-white rounded-3xl p-6 shadow-natural text-(--text-main)"
+      >
         <h1 className="text-xl font-bold tracking-tighter">Add a lost item</h1>
 
         <label
           htmlFor="dropzone-file"
-          className="flex flex-col items-center justify-center w-full h-40 transition duration-300 ease-in-out bg-white border cursor-pointer border-stone-100 rounded-2xl hover:bg-stone-50/85">
+          className="flex flex-col items-center justify-center w-full h-40 transition duration-300 ease-in-out bg-white border cursor-pointer border-stone-100 rounded-2xl hover:bg-stone-50/85"
+        >
           <div className="flex flex-col items-center justify-center pt-5 pb-6 text-body">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +106,8 @@ function AddItemModal({ setShowAddItemModal }) {
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="mb-6 size-6">
+              className="mb-6 size-6"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -160,7 +164,8 @@ function AddItemModal({ setShowAddItemModal }) {
         <div className="flex items-center justify-end gap-5 mt-2">
           <p
             onClick={handleCloseModal}
-            className="tracking-tight cursor-pointer">
+            className="tracking-tight cursor-pointer"
+          >
             Cancel
           </p>
           <button
@@ -168,7 +173,8 @@ function AddItemModal({ setShowAddItemModal }) {
             disabled={
               uploading || !file || !location.trim() || !description.trim()
             }
-            className="py-2 px-4 rounded-md text-white bg-(--text-main) hover:bg-(--text-main)/90 transition disabled:bg-(--text-main)/20 disabled:cursor-not-allowed">
+            className="py-2 px-4 rounded-md text-white bg-(--text-main) hover:bg-(--text-main)/90 transition disabled:bg-(--text-main)/20 disabled:cursor-not-allowed"
+          >
             {uploading ? "Uploading..." : "Post"}
           </button>
         </div>

@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useFinderModal } from "../contexts/FinderModalContext";
+import { compareItems } from "../api/gemini";
 
 function FinderModal() {
   const { selectedItem, closeFinder } = useFinderModal();
@@ -66,7 +67,8 @@ function FinderModal() {
     setResult(null);
 
     try {
-      console.log("calling gemini");
+      const aiResult = await compareItems(targetUrl, foundFile);
+      setResult(aiResult);
     } catch (error) {
       alert("Validation failed.");
       console.error(error);
@@ -90,7 +92,8 @@ function FinderModal() {
       onClick={(e) => {
         if (overlay.current === e.target) handleClose();
       }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/20 backdrop-blur-sm">
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/20 backdrop-blur-sm"
+    >
       <div className="bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[85vh] md:h-[600px]">
         <div className="flex flex-col w-full p-6 border-b md:w-1/2 bg-stone-50 md:border-b-0 md:border-r border-stone-100">
           <h3 className="mb-4 text-sm font-bold tracking-wider uppercase text-stone-400">
@@ -125,7 +128,8 @@ function FinderModal() {
               </p>
               <button
                 onClick={handleClose}
-                className="px-6 py-2 mt-4 text-white transition rounded-xl bg-stone-900 hover:bg-stone-800">
+                className="px-6 py-2 mt-4 text-white transition rounded-xl bg-stone-900 hover:bg-stone-800"
+              >
                 Close & Back to Feed
               </button>
             </div>
@@ -136,7 +140,8 @@ function FinderModal() {
               </h3>
               <form
                 onSubmit={handleSubmitFinder}
-                className="flex flex-col flex-1 gap-4">
+                className="flex flex-col flex-1 gap-4"
+              >
                 {/* Inputs */}
                 <div>
                   <label className="block mb-1 text-xs font-semibold text-stone-400">
@@ -178,12 +183,14 @@ function FinderModal() {
                   <button
                     type="button"
                     onClick={() => setShowFinderForm(false)}
-                    className="flex-1 py-3 font-medium transition text-stone-500 hover:bg-stone-100 rounded-xl">
+                    className="flex-1 py-3 font-medium transition text-stone-500 hover:bg-stone-100 rounded-xl"
+                  >
                     Back
                   </button>
                   <button
                     type="submit"
-                    className="flex-[2] py-3 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition shadow-lg shadow-emerald-100">
+                    className="flex-[2] py-3 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition shadow-lg shadow-emerald-100"
+                  >
                     Submit Info
                   </button>
                 </div>
@@ -223,7 +230,8 @@ function FinderModal() {
                             result.similarity >= 60
                               ? "text-green-400"
                               : "text-red-400"
-                          }`}>
+                          }`}
+                        >
                           {result.similarity}%
                         </div>
                         <p className="text-lg font-medium">
@@ -244,7 +252,8 @@ function FinderModal() {
                           setFoundPreview(null);
                           setResult(null);
                         }}
-                        className="absolute p-2 text-white transition rounded-full top-3 right-3 bg-white/20 hover:bg-white/40 backdrop-blur">
+                        className="absolute p-2 text-white transition rounded-full top-3 right-3 bg-white/20 hover:bg-white/40 backdrop-blur"
+                      >
                         ✕
                       </button>
                     )}
@@ -268,7 +277,8 @@ function FinderModal() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={handleClose}
-                  className="flex-1 py-3 font-medium transition text-stone-500 hover:bg-stone-100 rounded-xl">
+                  className="flex-1 py-3 font-medium transition text-stone-500 hover:bg-stone-100 rounded-xl"
+                >
                   Cancel
                 </button>
 
@@ -276,7 +286,8 @@ function FinderModal() {
                   <button
                     onClick={handleValidate}
                     disabled={!foundFile || analyzing}
-                    className="flex-[2] py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    className="flex-[2] py-3 bg-stone-900 text-white font-medium rounded-xl hover:bg-stone-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
                     {analyzing ? "Analyzing..." : "Validate Match"}
                   </button>
                 ) : (
@@ -284,7 +295,8 @@ function FinderModal() {
                   result.similarity >= 60 && (
                     <button
                       onClick={() => setShowFinderForm(true)}
-                      className="py-3 font-medium text-white transition bg-green-600 shadow-lg flex-2 rounded-xl hover:bg-green-700 shadow-green-200">
+                      className="py-3 font-medium text-white transition bg-green-600 shadow-lg flex-2 rounded-xl hover:bg-green-700 shadow-green-200"
+                    >
                       Next Step →
                     </button>
                   )
