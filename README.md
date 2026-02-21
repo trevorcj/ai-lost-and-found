@@ -2,6 +2,8 @@
 
 A simple Lost and Found web app built with React and Tailwind CSS. This project serves as the starter template for the **AI Lost & Found** workshop hosted by [MantaHQ](mantahq.com) in collaboration with **GDG on Campus Ontario Tech University, Oshawa, Canada**.
 
+[Live demo](https://ai-lost-and-found.vercel.app/)
+
 The goal is to teach students how AI and APIs can work together to solve real problems through a hands-on, beginner friendly build.
 
 ## Overview
